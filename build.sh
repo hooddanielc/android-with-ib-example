@@ -3,7 +3,7 @@ CURRENT_DIR=$(pwd)
 IB_CONFIG=debug
 IB_TARGET=jni/libnative-activity
 mkdir -p ../out/${IB_CONFIG}/${IB_TARGET}
-IB_OUTPUT=$(readlink -f ../out/${IB_CONFIG}/${IB_TARGET})
+IB_OUTPUT=../out/${IB_CONFIG}/${IB_TARGET}
 IB_OUTDIR=$(dirname $IB_OUTPUT)
 
 if [ -z ${ANDROID_HOME} ]; then
