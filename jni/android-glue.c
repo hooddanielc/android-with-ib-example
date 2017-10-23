@@ -167,10 +167,6 @@ void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd) {
     }
 }
 
-void app_dummy() {
-
-}
-
 static void android_app_destroy(struct android_app* android_app) {
     LOGV("android_app_destroy!");
     free_saved_state(android_app);
@@ -405,6 +401,14 @@ static void onNativeWindowCreated(ANativeActivity* activity, ANativeWindow* wind
     android_app_set_window((struct android_app*)activity->instance, window);
 }
 
+static void onNativeWindowResized(ANativeActivity *activity, ANativeWindow *window) {
+    LOGV("NativeWindowResized: %p -- %p\n", activity, window);
+}
+
+static void onNativeWindowRedrawNeeded(ANativeActivity *activity, ANativeWindow *window) {
+    LOGV("onNativeWindowRedrawNeeded: %p -- %p\n", activity, window);
+}
+
 static void onNativeWindowDestroyed(ANativeActivity* activity, ANativeWindow* window) {
     LOGV("NativeWindowDestroyed: %p -- %p\n", activity, window);
     android_app_set_window((struct android_app*)activity->instance, NULL);
@@ -418,6 +422,13 @@ static void onInputQueueCreated(ANativeActivity* activity, AInputQueue* queue) {
 static void onInputQueueDestroyed(ANativeActivity* activity, AInputQueue* queue) {
     LOGV("InputQueueDestroyed: %p -- %p\n", activity, queue);
     android_app_set_input((struct android_app*)activity->instance, NULL);
+}
+
+static void onContentRectChanged(ANativeActivity *activity, const ARect *rect) {
+    LOGV(
+        "onContentRectChanged: %p -- left=%i top=%i right=%i bottom=%i\n",
+        activity, rect->left, rect->top, rect->right, rect->bottom
+    );
 }
 
 JNIEXPORT
@@ -437,6 +448,9 @@ void ANativeActivity_onCreate(ANativeActivity* activity, void* savedState,
     activity->callbacks->onNativeWindowDestroyed = onNativeWindowDestroyed;
     activity->callbacks->onInputQueueCreated = onInputQueueCreated;
     activity->callbacks->onInputQueueDestroyed = onInputQueueDestroyed;
+    activity->callbacks->onNativeWindowResized = onNativeWindowResized;
+    activity->callbacks->onNativeWindowRedrawNeeded = onNativeWindowRedrawNeeded;
+    activity->callbacks->onContentRectChanged = onContentRectChanged;
 
     activity->instance = android_app_create(activity, savedState, savedStateSize);
 }

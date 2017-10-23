@@ -1,4 +1,5 @@
 set -e
+CURRENT_DIR=$(pwd)
 IB_CONFIG=debug
 IB_TARGET=jni/libnative-activity
 mkdir -p ../out/${IB_CONFIG}/${IB_TARGET}
@@ -46,8 +47,12 @@ mkdir -p ${IB_OUTPUT}/lib/arm64-v8a
 cp ../out/debug/jni/libnative-activity.so ${IB_OUTPUT}/lib/arm64-v8a/libnative-activity.so
 
 $ANDROID_HOME/build-tools/25.0.2/aapt package -f -M AndroidManifest.xml -S res -I ${ANDROID_HOME}/platforms/android-25/android.jar -F ${IB_OUTPUT}/bin/NativeActivity.unsigned.apk ${IB_OUTPUT}/bin
-$ANDROID_HOME/build-tools/25.0.2/aapt add ${IB_OUTPUT}/bin/NativeActivity.unsigned.apk \
-  ${IB_OUTPUT}/lib/arm64-v8a/libnative-activity.so
+
+# add library
+cd ${IB_OUTPUT}
+$ANDROID_HOME/build-tools/25.0.2/aapt add bin/NativeActivity.unsigned.apk \
+  lib/arm64-v8a/libnative-activity.so
+cd ${CURRENT_DIR}
 
 if [ ! -f ${IB_OUTPUT}/ToyKey.keystore ]; then
   keytool \
