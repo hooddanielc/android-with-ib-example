@@ -1,6 +1,4 @@
-IB_CONFIG=debug
-IB_TARGET=jni/libnative-activity
-IB_OUTPUT=$(readlink -f ../out/${IB_CONFIG}/${IB_TARGET})
+. build_vars.sh
 
 # uninstall
 HAS_PKG="`adb shell pm list packages | grep -c 'com.example.native_activity'`"

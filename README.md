@@ -11,6 +11,7 @@ Download android sdk command line tools [here](https://developer.android.com/stu
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home
 export ANDROID_HOME=/opt/android-sdk
 export PATH=$PATH:$HOME/src/ib
+export PATH=$PATH:/opt/android-sdk/tools
 export PATH=$PATH:/opt/android-sdk/tools/bin
 export PATH=$PATH:/opt/android-sdk/platform-tools
 ```
