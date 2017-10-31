@@ -1,5 +1,5 @@
 set -e
-. build_vars.sh
+. ./build_vars.sh
 
 if [ -z ${ANDROID_HOME} ]; then
   echo '$ANDROID_HOME not set'

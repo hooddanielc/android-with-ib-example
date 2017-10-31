@@ -1,5 +1,5 @@
 
-# use x86_64 for emulator. options for phone
+# options for phone
 # ANDROID_TOOLCHAIN=arm64
 # ANDROID_ARCH=arm64-v8a
 
