@@ -14,4 +14,4 @@ adb install -r ${IB_OUTPUT}/bin/NativeActivity.apk
 adb shell am start -n com.example.native_activity/android.app.NativeActivity
 
 # log output
-adb logcat 'native-activity:V' *:S
+adb logcat native-activity:V threaded_app:V *:E *:S
