@@ -9,7 +9,7 @@ public:
 
   bool is_increasing;
 
-  my_app_t(): red_value(0.0), is_increasing(true) {}
+  my_app_t(int argc, char*argv[]): brusque::app_t(argc, argv), red_value(0.0), is_increasing(true) {}
 
   virtual void on_create() {
     std::cout << "on_create" << std::endl;
@@ -58,6 +58,8 @@ public:
 
 };
 
-int android_main(int argc, char *argv[]) {
-  return my_app_t{}.main(argc, argv);
-}
+template class brusque::factory_t<my_app_t>;
+
+// int android_main(int argc, char *argv[]) {
+//   return my_app_t{}.main(argc, argv);
+// }
