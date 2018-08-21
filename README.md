@@ -21,7 +21,7 @@ Install android sdk tools using sdkmanager.
 ```
 sdkmanager --update
 sdkmanager ndk-bundle
-sdkmanager 'build-tools;25.0.2'
+sdkmanager 'build-tools;28.0.1'
 sdkmanager "platforms;android-25"
 ```
 

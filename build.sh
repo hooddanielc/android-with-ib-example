@@ -1,4 +1,4 @@
-set -e
+#!/bin/bash -xe
 . ./build_vars.sh
 
 if [ -z ${ANDROID_HOME} ]; then
@@ -20,11 +20,14 @@ mkdir -p ${IB_OUTPUT}/src/com/example/native_activity
 # create the toolchain
 if [ ! -d ${ANDROID_TOOLCHAIN_DIR} ]; then
   $ANDROID_HOME/ndk-bundle/build/tools/make_standalone_toolchain.py \
-    --arch ${ANDROID_TOOLCHAIN} --api 24 --install-dir ${ANDROID_TOOLCHAIN_DIR}
+    --arch ${TARGET_ARCH} \
+    --api ${ANDROID_API} \
+    --install-dir ${ANDROID_TOOLCHAIN_DIR} \
+    --stl=libc++
 fi
 
 # create the R.java
-$ANDROID_HOME/build-tools/25.0.2/aapt package \
+$ANDROID_HOME/build-tools/$ANDROID_PLATFORM/aapt package \
   -f -m  -S res -J ${IB_OUTPUT}/src -M AndroidManifest.xml \
   -I ${ANDROID_HOME}/platforms/android-25/android.jar
 
@@ -32,21 +35,24 @@ $ANDROID_HOME/build-tools/25.0.2/aapt package \
 javac -source 1.7 -target 1.7 -d ${IB_OUTPUT}/obj -classpath $ANDROID_HOME/platforms/android-25/android.jar -sourcepath ${IB_OUTPUT}/src ${IB_OUTPUT}/src/com/example/native_activity/R.java
 
 # build classes.dex
-$ANDROID_HOME/build-tools/25.0.2/dx --dex --output=${IB_OUTPUT}/bin/classes.dex ${IB_OUTPUT}/obj
+$ANDROID_HOME/build-tools/$ANDROID_PLATFORM/dx --dex --output=${IB_OUTPUT}/bin/classes.dex ${IB_OUTPUT}/obj
 
 # build the good part
 ib --cfg ${IB_CONFIG} ${IB_TARGET}.so $@
 
 # build an unsigned apk
-mkdir -p ${IB_OUTPUT}/lib/${ANDROID_ARCH}
-cp ../out/${IB_CONFIG}/jni/libnative-activity.so ${IB_OUTPUT}/lib/${ANDROID_ARCH}/libnative-activity.so
+mkdir -p ${IB_OUTPUT}/lib/${TARGET_CPU_ABI}
+cp ../out/${IB_CONFIG}/jni/libnative-activity.so ${IB_OUTPUT}/lib/${TARGET_CPU_ABI}/libnative-activity.so
+cp ${ANDROID_TOOLCHAIN_DIR}/aarch64-linux-android/lib/libc++_shared.so ${IB_OUTPUT}/lib/${TARGET_CPU_ABI}/libc++_shared.so
 
-$ANDROID_HOME/build-tools/25.0.2/aapt package -f -M AndroidManifest.xml -S res -I ${ANDROID_HOME}/platforms/android-25/android.jar -F ${IB_OUTPUT}/bin/NativeActivity.unsigned.apk ${IB_OUTPUT}/bin
+$ANDROID_HOME/build-tools/$ANDROID_PLATFORM/aapt package -f -M AndroidManifest.xml -S res -I ${ANDROID_HOME}/platforms/android-25/android.jar -F ${IB_OUTPUT}/bin/NativeActivity.unsigned.apk ${IB_OUTPUT}/bin
 
 # add library
 cd ${IB_OUTPUT}
-$ANDROID_HOME/build-tools/25.0.2/aapt add bin/NativeActivity.unsigned.apk \
-  lib/${ANDROID_ARCH}/libnative-activity.so
+$ANDROID_HOME/build-tools/$ANDROID_PLATFORM/aapt add bin/NativeActivity.unsigned.apk \
+  lib/${TARGET_CPU_ABI}/libnative-activity.so
+$ANDROID_HOME/build-tools/$ANDROID_PLATFORM/aapt add bin/NativeActivity.unsigned.apk \
+  lib/${TARGET_CPU_ABI}/libc++_shared.so
 cd ${CURRENT_DIR}
 
 if [ ! -f ${IB_OUTPUT}/ToyKey.keystore ]; then
@@ -61,6 +67,6 @@ jarsigner -keystore ${IB_OUTPUT}/ToyKey.keystore -storepass 123456 -keypass 1234
   -signedjar ${IB_OUTPUT}/bin/NativeActivity.signed.apk ${IB_OUTPUT}/bin/NativeActivity.unsigned.apk NativeActivityKey
 
 # complete apk
-$ANDROID_HOME/build-tools/25.0.2/zipalign -f 4 ${IB_OUTPUT}/bin/NativeActivity.signed.apk ${IB_OUTPUT}/bin/NativeActivity.apk
+$ANDROID_HOME/build-tools/$ANDROID_PLATFORM/zipalign -f 4 ${IB_OUTPUT}/bin/NativeActivity.signed.apk ${IB_OUTPUT}/bin/NativeActivity.apk
 
 echo 'sucessful build'

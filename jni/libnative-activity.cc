@@ -1,3 +1,4 @@
+#include <cstring>
 #include <cstdlib>
 #include <initializer_list>
 #include <jni.h>
